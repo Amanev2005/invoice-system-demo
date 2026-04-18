@@ -1,0 +1,66 @@
+
+
+class ClientSerializer(serializers.ModelSerializer):
+    """Serializer for Client model"""
+    invoice_count = serializers.SerializerMethodField()
+    overdue_amount = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Client
+        fields = [
+            'id', 'name', 'email', 'phone', 'address',
+            'credit_limit', 'credit_terms', 'current_balance',
+            'invoice_count', 'overdue_amount',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['current_balance', 'created_at', 'updated_at']
+    
+    def get_invoice_count(self, obj):
+        return obj.invoices.count()
+    
+    def get_overdue_amount(self, obj):
+        """Calculate total overdue amount for this client"""
+        from django.utils import timezone
+        overdue_invoices = obj.invoices.filter(
+            due_date__lt=timezone.now().date(),
+            status__in=['draft', 'sent']
+        )
+        return sum(invoice.balance_due for invoice in overdue_invoices)
+
+
+class PaymentSerializer(serializers.ModelSerializer):
+    """Serializer for Payment model"""
+    invoice_number = serializers.CharField(source='invoice.invoice_number', read_only=True)
+    client_name = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Payment
+        fields = [
+            'id', 'invoice', 'invoice_number', 'client_name',
+            'amount', 'payment_date', 'payment_method',
+            'reference_number', 'notes', 'created_at', 'created_by'
+        ]
+        read_only_fields = ['created_at']
+    
+    def get_client_name(self, obj):
+        if obj.invoice.client:
+            return obj.invoice.client.name
+        return obj.invoice.client_name
+    
+    def validate_amount(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("Payment amount must be greater than 0")
+        return value
+    
+    def validate(self, data):
+        """Validate that payment doesn't exceed invoice balance"""
+        invoice = data.get('invoice')
+        amount = data.get('amount')
+        
+        if invoice and amount:
+            if amount > invoice.balance_due:
+                raise serializers.ValidationError(
+                    f"Payment amount ({amount}) exceeds invoice balance ({invoice.balance_due})"
+                )
+        
+        return data

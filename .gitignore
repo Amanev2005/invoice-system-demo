@@ -1,0 +1,71 @@
+# =============================================
+# Invoice System - .gitignore
+# =============================================
+
+# ----- SECRETS & ENVIRONMENT -----
+backend/.env
+# Keep .env.example (template for developers)
+
+# ----- PYTHON -----
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+backend/venv/
+backend/.venv
+backend/.venv/
+*.egg-info/
+.eggs/
+
+# ----- DATABASE & RUNTIME DATA -----
+backend/db.sqlite3
+backend/backups/
+backend/media/
+
+# ----- NODE / FRONTEND -----
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.production
+
+# ----- ELECTRON INSTALLER -----
+electron-installer/node_modules/
+electron-installer/dist/
+# Embedded Python & PostgreSQL binaries (hundreds of MB - download via prepare-resources.bat)
+electron-installer/resources/python/
+electron-installer/resources/postgresql/
+
+# ----- BUILD ARTIFACTS & PACKAGES -----
+*.zip
+*.exe
+*.msi
+*.dmg
+*.AppImage
+dist/
+build/
+
+# ----- DEV & TEST FILES -----
+processes_dump.csv
+backend/test_export.csv
+backend/test_export.py
+backend/test_invoice.json
+backend/test_view.py
+backend/create_sample_data.py
+
+# ----- EDITOR & OS -----
+.vscode/
+.idea/
+*.suo
+*.user
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+
+# ----- LOGS -----
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

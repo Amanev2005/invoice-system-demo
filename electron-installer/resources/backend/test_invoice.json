@@ -1,0 +1,18 @@
+{
+    "invoice_number": "",
+    "invoice_date": "2026-02-11",
+    "due_date": "",
+    "client": null,
+    "client_name": "Test Client",
+    "payment_method": "CASH/DEBIT MEMO",
+    "status": "draft",
+    "notes": "",
+    "items": [
+        {
+            "description": "Test Item",
+            "quantity": 1,
+            "rate": 100,
+            "amount": 100
+        }
+    ]
+}

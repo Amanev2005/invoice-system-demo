@@ -1,0 +1,12 @@
+Django>=4.2.0
+djangorestframework>=3.14.0
+django-cors-headers>=4.0.0
+reportlab>=4.0.0
+Pillow>=10.0.0
+openpyxl>=3.1.0
+pandas>=2.0.0
+psycopg2-binary>=2.9.0
+gunicorn>=21.0.0  # For Linux/Unix production
+waitress>=2.1.0   # For Windows production
+python-dotenv>=1.0.0
+APScheduler>=3.10.4

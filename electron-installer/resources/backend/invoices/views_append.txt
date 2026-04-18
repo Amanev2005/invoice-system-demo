@@ -1,0 +1,106 @@
+
+
+class ClientViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for Client CRUD operations
+    """
+    queryset = Client.objects.all()
+    serializer_class = ClientSerializer
+    
+    def get_queryset(self):
+        """Filter clients by search query"""
+        queryset = Client.objects.all()
+        search = self.request.query_params.get('search', None)
+        
+        if search:
+            queryset = queryset.filter(
+                Q(name__icontains=search) |
+                Q(email__icontains=search) |
+                Q(phone__icontains=search)
+            )
+        
+        return queryset.order_by('name')
+    
+    @action(detail=True, methods=['get'])
+    def invoices(self, request, pk=None):
+        """Get all invoices for a client"""
+        client = self.get_object()
+        invoices = client.invoices.all().order_by('-invoice_date')
+        serializer = InvoiceListSerializer(invoices, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=True, methods=['get'])
+    def statement(self, request, pk=None):
+        """Generate statement of account for a client"""
+        client = self.get_object()
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        # Get date range from query params or default to last 30 days
+        end_date = timezone.now().date()
+        start_date = end_date - timedelta(days=30)
+        
+        if request.query_params.get('start_date'):
+            start_date = datetime.strptime(request.query_params['start_date'], '%Y-%m-%d').date()
+        if request.query_params.get('end_date'):
+            end_date = datetime.strptime(request.query_params['end_date'], '%Y-%m-%d').date()
+        
+        # Get invoices in date range
+        invoices = client.invoices.filter(
+            invoice_date__gte=start_date,
+            invoice_date__lte=end_date
+        ).order_by('invoice_date')
+        
+        # Calculate aging
+        today = timezone.now().date()
+        aging = {
+            'current': 0,
+            'days_30': 0,
+            'days_60': 0,
+            'days_90_plus': 0
+        }
+        
+        for invoice in invoices:
+            if invoice.balance_due > 0 and invoice.due_date:
+                days_overdue = (today - invoice.due_date).days
+                if days_overdue < 0:
+                    aging['current'] += float(invoice.balance_due)
+                elif days_overdue < 30:
+                    aging['days_30'] += float(invoice.balance_due)
+                elif days_overdue < 60:
+                    aging['days_60'] += float(invoice.balance_due)
+                else:
+                    aging['days_90_plus'] += float(invoice.balance_due)
+        
+        return Response({
+            'client': ClientSerializer(client).data,
+            'invoices': InvoiceListSerializer(invoices, many=True).data,
+            'aging': aging,
+            'total_outstanding': float(client.current_balance),
+            'date_range': {
+                'start': start_date,
+                'end': end_date
+            }
+        })
+
+
+class PaymentViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for Payment CRUD operations
+    """
+    queryset = Payment.objects.all()
+    serializer_class = PaymentSerializer
+    
+    def get_queryset(self):
+        """Filter payments by invoice or client"""
+        queryset = Payment.objects.all()
+        invoice_id = self.request.query_params.get('invoice', None)
+        client_id = self.request.query_params.get('client', None)
+        
+        if invoice_id:
+            queryset = queryset.filter(invoice_id=invoice_id)
+        
+        if client_id:
+            queryset = queryset.filter(invoice__client_id=client_id)
+        
+        return queryset.order_by('-payment_date', '-created_at')
