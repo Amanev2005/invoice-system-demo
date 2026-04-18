@@ -1,6 +1,6 @@
 # 💼 Invoice Management System
 
-![Dashboard](docs/images/dashboard.png)
+![Dashboard](dashboard.png)
 
 A comprehensive, professional-grade Invoice Management System designed for efficiency and ease of use. Built with a modern tech stack, it provides a seamless desktop experience with a powerful backend for handling clients, invoices, quotations, and financial tracking.
 
@@ -104,4 +104,3 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 ---
 
-*Customized for **Rashid Typing & Document Clearing***
