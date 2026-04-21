@@ -19,7 +19,7 @@ services:
       - key: DB_NAME
         fromDatabase:
           name: invoice-db
-          property: name
+          property: database
       - key: DB_USER
         fromDatabase:
           name: invoice-db
