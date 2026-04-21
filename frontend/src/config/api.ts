@@ -1,10 +1,11 @@
+/// <reference types="vite/client" />
 // This will use the current host for API calls, making it work on LAN
 // In Electron (file://), hostname is empty, so we default to 127.0.0.1
 const hostname = (!window.location.hostname || window.location.hostname === 'localhost')
     ? '127.0.0.1'
     : window.location.hostname;
 
-const API_BASE_URL = `http://${hostname}:8000`;
+const API_BASE_URL = import.meta.env.VITE_API_URL || `http://${hostname}:8000`;
 
 export const API_ENDPOINTS = {
     BASE: `${API_BASE_URL}/api`,
