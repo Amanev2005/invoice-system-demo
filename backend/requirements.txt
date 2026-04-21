@@ -10,3 +10,4 @@ gunicorn>=21.0.0  # For Linux/Unix production
 waitress>=2.1.0   # For Windows production
 python-dotenv>=1.0.0
 APScheduler>=3.10.4
+dj-database-url>=2.1.0

@@ -52,19 +52,18 @@ TEMPLATES = [
 ROOT_URLCONF = 'config.urls'
 
 # Database Configuration
-DB_ENGINE = os.getenv('DB_ENGINE', 'sqlite')
+import dj_database_url
 
-if DB_ENGINE == 'postgresql':
+# Database Configuration
+DATABASE_URL = os.getenv('DATABASE_URL')
+
+if DATABASE_URL:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('DB_NAME', 'invoice_system'),
-            'USER': os.getenv('DB_USER', 'invoice_user'),
-            'PASSWORD': os.getenv('DB_PASSWORD', ''),
-            'HOST': os.getenv('DB_HOST', 'localhost'),
-            'PORT': os.getenv('DB_PORT', '5433'),
-            'CONN_MAX_AGE': 600,  # Connection pooling
-        }
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=True
+        )
     }
 else:
     # Fallback to SQLite for development
@@ -74,6 +73,28 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3'
         }
     }
+import dj_database_url
+
+# Database Configuration
+DATABASE_URL = os.getenv('DATABASE_URL')
+
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=True
+        )
+    }
+else:
+    # Fallback to SQLite for development
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3'
+        }
+    }
+
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Dubai'
