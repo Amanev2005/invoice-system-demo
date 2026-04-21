@@ -4,7 +4,7 @@ services:
     name: invoice-backend
     env: python
     buildCommand: pip install -r backend/requirements.txt && python backend/manage.py migrate
-    startCommand: gunicorn -c backend/gunicorn_config.py config.wsgi:application
+    startCommand: gunicorn --chdir backend -c gunicorn_config.py config.wsgi:application
     envVars:
       - key: DATABASE_URL
         fromDatabase:
