@@ -57,6 +57,7 @@ import dj_database_url
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 if DATABASE_URL:
+    print("✓ Using PostgreSQL Database (Persistent storage)")
     DATABASES = {
         'default': dj_database_url.config(
             default=DATABASE_URL,
@@ -65,6 +66,8 @@ if DATABASE_URL:
         )
     }
 else:
+    print("⚠️ WARNING: DATABASE_URL not found. Using SQLite Database.")
+    print("⚠️ IMPORTANT: Data saved to SQLite on Render will be LOST when the server sleeps or restarts!")
     # Fallback to SQLite for development
     DATABASES = {
         'default': {
