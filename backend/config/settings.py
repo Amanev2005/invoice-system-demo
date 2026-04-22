@@ -55,9 +55,10 @@ ROOT_URLCONF = 'config.urls'
 import dj_database_url
 
 DATABASE_URL = os.getenv('DATABASE_URL')
+DB_HOST = os.getenv('DB_HOST')
 
 if DATABASE_URL:
-    print("✓ Using PostgreSQL Database (Persistent storage)")
+    print("✓ Using PostgreSQL Database (via DATABASE_URL)")
     DATABASES = {
         'default': dj_database_url.config(
             default=DATABASE_URL,
@@ -65,8 +66,21 @@ if DATABASE_URL:
             ssl_require=True
         )
     }
+elif DB_HOST:
+    print("✓ Using PostgreSQL Database (via individual DB_* variables)")
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME', 'postgres'),
+            'USER': os.getenv('DB_USER', 'postgres'),
+            'PASSWORD': os.getenv('DB_PASSWORD', ''),
+            'HOST': DB_HOST,
+            'PORT': os.getenv('DB_PORT', '5432'),
+            'CONN_MAX_AGE': 600,
+        }
+    }
 else:
-    print("⚠️ WARNING: DATABASE_URL not found. Using SQLite Database.")
+    print("⚠️ WARNING: DATABASE_URL or DB_HOST not found. Using SQLite Database.")
     print("⚠️ IMPORTANT: Data saved to SQLite on Render will be LOST when the server sleeps or restarts!")
     # Fallback to SQLite for development
     DATABASES = {
